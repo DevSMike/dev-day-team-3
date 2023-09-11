@@ -1,0 +1,45 @@
+package com.team3.holiday.service;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.team3.holiday.dto.DevBodyDto;
+import com.team3.holiday.dto.DevBodyInfoDto;
+import com.team3.holiday.model.DevBody;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.team3.holiday.dto.mapper.DevBodyMapper.toDevBodyDtoFromDevBody;
+import static com.team3.holiday.dto.mapper.DevBodyMapper.toDevBodyInfoDtoFromDevBody;
+
+@Service
+@Slf4j
+public class HttpClientServiceImpl implements HttpClientService {
+
+    @Override
+    public DevBodyDto registerUser(DevBody body) {
+        log.debug("HttpClientServiceImpl: registerUser with object: " +  body);
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("name", body.getName());
+        requestBody.put("gitHubUrl", body.getGitHubUrl());
+        requestBody.put("participants", body.getParticipants());
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String requestBodyJson;
+        try {
+            requestBodyJson = objectMapper.writeValueAsString(requestBody);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Ошибка при преобразовании в JSON", e);
+        }
+
+        return toDevBodyDtoFromDevBody(body, requestBodyJson);
+    }
+
+    @Override
+    public DevBodyInfoDto getRegistrationAnswer(DevBody body) {
+        log.debug("HttpClientServiceImpl: answer a reg with object: " +  body);
+        return toDevBodyInfoDtoFromDevBody(body);
+    }
+}
