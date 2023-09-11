@@ -13,6 +13,8 @@ import java.util.Map;
 
 import static com.team3.holiday.dto.mapper.DevBodyMapper.toDevBodyDtoFromDevBody;
 import static com.team3.holiday.dto.mapper.DevBodyMapper.toDevBodyInfoDtoFromDevBody;
+import static com.team3.holiday.util.DecodeCaesarCipherUtil.decodeCaesarCipher;
+import static com.team3.holiday.util.ExtractFromStringUtil.extractValueFromResponse;
 
 @Service
 @Slf4j
@@ -41,5 +43,16 @@ public class HttpClientServiceImpl implements HttpClientService {
     public DevBodyInfoDto getRegistrationAnswer(DevBody body) {
         log.debug("HttpClientServiceImpl: answer a reg with object: " +  body);
         return toDevBodyInfoDtoFromDevBody(body);
+    }
+
+    @Override
+    public String decodeMessage(String code) {
+        String textFromHtml = extractValueFromResponse(code, "encoded");
+        String encodedText = textFromHtml.substring(1, textFromHtml.lastIndexOf(",") - 1);
+        int offset = Integer.parseInt(textFromHtml.substring(textFromHtml.lastIndexOf(" ") + 2));
+        String decodedText = decodeCaesarCipher(encodedText, offset);
+
+        // Создаем JSON для POST-запроса
+        return "{\"decoded\": \"" + decodedText + "\"}";
     }
 }

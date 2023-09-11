@@ -19,7 +19,7 @@ public class DevBodyMapper {
         return  DevBodyInfoDto.builder()
                 .name(body.getName())
                 .nextTaskUrl("http://ya.praktikum.fvds.ru:8080/dev-day/task/2")
-                .token("token")
+                .token("e26d3434-c970-482a-b055-e2a55a364581")
                 .build();
     }
 }
