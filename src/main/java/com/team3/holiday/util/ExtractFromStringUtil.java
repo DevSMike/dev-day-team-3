@@ -9,8 +9,8 @@ public class ExtractFromStringUtil {
 
     public static String extractValueFromResponse(String responseBody, String key) {
         Document document = Jsoup.parse(responseBody);
-
         Elements elements = document.select("code span");
+
         for (Element element : elements) {
             String spanText = element.text();
             if (spanText.contains("\"" + key + "\"")) {

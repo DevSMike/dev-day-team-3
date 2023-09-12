@@ -15,6 +15,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
+import java.io.UnsupportedEncodingException;
+
 
 @RestController
 @Slf4j
@@ -32,7 +34,7 @@ public class HttpClientController {
 
         //async query
         return client.post()
-                .uri("http://localhost:8080/register/post")
+                .uri("http://localhost:8080/task1/answer")
                 .header("MAIN_ANSWER", "42")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
@@ -90,5 +92,72 @@ public class HttpClientController {
 
         return result;
     }
+
+    //task 3 11/09/23
+    @PostMapping("/task3")
+    public String generatePassword() {
+        log.info("HttpClientController: making a register");
+
+        String pass = httpClientService.generatePassword();
+        log.info(pass);
+        //async query
+        String result = null;
+        try {
+            result = client.post()
+                    .uri("http://ya.praktikum.fvds.ru:8080/dev-day/task/3")
+                    .header("AUTH_TOKEN", "e26d3434-c970-482a-b055-e2a55a364581")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .bodyValue("{\"password\": \"" + pass + "\"}")
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+        } catch (WebClientResponseException.BadRequest ex) {
+            String responseBody = ex.getResponseBodyAsString();
+            log.info(responseBody);
+        }
+        return result;
+
+    }
+
+
+    //task 4 12/09/23
+
+    @GetMapping("/task4")
+    public String getAnStringCoded() throws UnsupportedEncodingException {
+        log.info("HttpClientController: getting a coded string");
+
+
+//        //async query
+//        return client.get()
+//                .uri("http://localhost:8080/task1/answer")
+////                .header("MAIN_ANSWER", "42")
+//                .accept(MediaType.APPLICATION_JSON)
+//                .retrieve()
+//                .bodyToMono(String.class)
+//                .block();
+
+
+        String url = "https://2cyr.com/decode/?lang=ru";
+        String text = "Øèðîêàÿ ýëåêòðèôèêàöèÿ";
+        String response = client.post()
+                .uri(url)
+                .bodyValue("text=" + text)
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+
+        //String coded = "Øèðîêàÿ ýëåêòðèôèêàöèÿ";
+       // String decoded = httpClientService.decodeCongratulations(coded);
+        return  "";
+
+    }
+
+//    @PostMapping("/task4")
+//    public String sendDecodedString() {
+//        log.info("HttpClientController: send a decoded string");
+//
+//
+//    }
 }
 
