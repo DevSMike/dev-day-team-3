@@ -1,0 +1,135 @@
+{
+  "info": {
+    "_postman_id": "b06e5306-d255-480f-845b-46dead0470b2",
+    "name": "Day of Programmer",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "25787051"
+  },
+  "item": [
+    {
+      "name": "PostRegister",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "MAIN_ANSWER",
+            "value": "42",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"name\": \"Team3\", \"gitHubUrl\":\"https://github.com/DevSMike/dev-day-team-3\", \"participants\":\r\n[\r\n  {\r\n    \"email\": \"starrose777@yandex.ru\",\r\n    \"cohort\": \"java_33\",\r\n    \"firstName\": \"Alexander\",\r\n    \"lastName\": \"Kosarev\"\r\n  },\r\n  {\r\n    \"email\": \"dvn96@yandex.ru\",\r\n    \"cohort\": \"java_29\",\r\n    \"firstName\": \"Dmitry\",\r\n    \"lastName\": \"Novik\"\r\n  },\r\n  {\r\n    \"email\": \"likashev.migha@yandex.ru\",\r\n    \"cohort\": \"java_16\",\r\n    \"firstName\": \"Mikhail\",\r\n    \"lastName\": \"Lukashev\"\r\n  }\r\n]}\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://ya.praktikum.fvds.ru:8080/dev-day/register",
+          "protocol": "http",
+          "host": [
+            "ya",
+            "praktikum",
+            "fvds",
+            "ru"
+          ],
+          "port": "8080",
+          "path": [
+            "dev-day",
+            "register"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "task1_1",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "localhost:8080/register",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "register"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "task1_2",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "localhost:8080/register/post",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "register",
+            "post"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get_tast_2",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "task2_get_query",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "get_task_3",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "post_task_3",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "localhost:8080/task3",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "task3"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get_task_4",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    }
+  ]
+}
