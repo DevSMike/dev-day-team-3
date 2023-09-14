@@ -1,17 +1,13 @@
 package com.team3.holiday;
 
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-import reactor.core.publisher.Mono;
 
-import java.time.Duration;
 
-@SpringBootApplication
+//legacy endless requesting class
 public class WebClientExample {
     public static void main(String[] args) {
         SpringApplication.run(WebClientExample.class, args);

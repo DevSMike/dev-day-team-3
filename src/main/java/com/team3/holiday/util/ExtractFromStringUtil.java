@@ -22,4 +22,41 @@ public class ExtractFromStringUtil {
 
         return "";
     }
+
+    public static String extractValueFromCodeSpan(String responseBody) {
+        Document document = Jsoup.parse(responseBody);
+        Elements elements = document.select("code span");
+
+        for (Element element : elements) {
+            return element.text();
+        }
+
+        return "";
+    }
+
+    public static String extractValueFromDecoderResponse(String responseBody) {
+        Document document = Jsoup.parse(responseBody);
+        Elements elements = document.select("mark");
+        int i = 0;
+        for (Element element : elements) {
+            i++;
+            if (i == 2) {
+                return element.text();
+            }
+        }
+        return "";
+    }
+
+    public static String extractValueWithAnswerFromCoder(String responseBody, String key) {
+        Document document = Jsoup.parse(responseBody);
+        Elements elements = document.select("option");
+        for (Element element : elements) {
+            String spanText = element.toString();
+            if (spanText.contains(key) && !spanText.contains("selected")) {
+                return element.text();
+            }
+        }
+
+        return "";
+    }
 }
