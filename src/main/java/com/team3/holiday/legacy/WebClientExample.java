@@ -1,4 +1,4 @@
-package com.team3.holiday;
+package com.team3.holiday.legacy;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.http.MediaType;

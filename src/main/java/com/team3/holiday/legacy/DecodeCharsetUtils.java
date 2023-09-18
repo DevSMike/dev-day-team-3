@@ -1,4 +1,4 @@
-package com.team3.holiday.util;
+package com.team3.holiday.legacy;
 
 import com.ibm.icu.text.CharsetDetector;
 import com.ibm.icu.text.CharsetMatch;
