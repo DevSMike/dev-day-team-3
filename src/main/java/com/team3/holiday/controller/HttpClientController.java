@@ -31,27 +31,20 @@ public class HttpClientController {
         DevBodyDto bodyDto = httpClientService.registerUser(body);
 
         //async query
-        return client.post()
-                .uri("http://localhost:8080/task1/answer")
+        Mono<DevBodyInfoDto> info =  client.post()
+                .uri("http://ya.praktikum.fvds.ru:8080/dev-day/register")
                 .header("MAIN_ANSWER", "42")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(bodyDto.getRequestBodyJson())
                 .retrieve()
                 .bodyToMono(DevBodyInfoDto.class);
-    }
-
-    @PostMapping("/task1/answer")
-    public Mono<DevBodyInfoDto> answerRegistration(@RequestBody DevBody body) {
-        log.info("HttpClientController: answer a register");
-        DevBodyInfoDto answer = httpClientService.getRegistrationAnswer(body);
-
-        log.info("Registration answer: " + answer);
-        return Mono.just(answer);
+        log.info("Registration answer: " + info);
+        return info;
     }
 
     //task 2 10/09/23
-    @GetMapping("/task2/get")
+    @GetMapping("/task2")
     public String decodeMessage() {
         log.info("HttpClientController: task2 get HTML string code");
         String resultOfGet = null;
@@ -65,7 +58,7 @@ public class HttpClientController {
                     .block();
         } catch (WebClientResponseException.BadRequest ex) {
             String responseBody = ex.getResponseBodyAsString();
-            log.info(responseBody);
+            log.debug(responseBody);
         }
 
         String decoded = httpClientService.decodeMessage(resultOfGet);
@@ -82,10 +75,7 @@ public class HttpClientController {
                     .block();
         } catch (WebClientResponseException.BadRequest ex) {
             String responseBody = ex.getResponseBodyAsString();
-            if (responseBody.contains("<span>Ваша команда &quot;Team3&quot; уже выполнила Задание 2</span>")) {
-                result = "{\"completed\":true,\"message\":\"Вы успели! Настоящие программисты всегда на шаг " +
-                        "впереди железяк:)\",\"nextTaskUrl\":\"http://ya.praktikum.fvds.ru:8080/dev-day/task/3\"}";
-            }
+            log.debug(responseBody);
         }
 
         return result;
@@ -114,9 +104,7 @@ public class HttpClientController {
             log.info(responseBody);
         }
         return result;
-
     }
-
 
     //task 4 12/09/23
     @PostMapping("/task4")
@@ -154,6 +142,7 @@ public class HttpClientController {
             String responseBody = ex.getResponseBodyAsString();
             log.info(responseBody);
         }
+
         return result;
 
     }
