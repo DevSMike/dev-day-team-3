@@ -1,9 +1,9 @@
 package com.team3.holiday.controller;
 
 import com.team3.holiday.dto.DevBodyDto;
-import com.team3.holiday.dto.DevBodyInfoDto;
+import com.team3.holiday.dto.DevBodyInfo;
 import com.team3.holiday.model.DevBody;
-import com.team3.holiday.service.HttpClientService;
+import com.team3.holiday.service.client.HttpClientService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -26,19 +26,19 @@ public class HttpClientController {
 
     //task 1 09/09/23
     @PostMapping("/task1")
-    public Mono<DevBodyInfoDto> makeRegister(@RequestBody DevBody body) {
+    public Mono<DevBodyInfo> makeRegister(@RequestBody DevBody body) {
         log.info("HttpClientController: making a register");
         DevBodyDto bodyDto = httpClientService.registerUser(body);
 
         //async query
-        Mono<DevBodyInfoDto> info =  client.post()
+        Mono<DevBodyInfo> info =  client.post()
                 .uri("http://ya.praktikum.fvds.ru:8080/dev-day/register")
                 .header("MAIN_ANSWER", "42")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(bodyDto.getRequestBodyJson())
                 .retrieve()
-                .bodyToMono(DevBodyInfoDto.class);
+                .bodyToMono(DevBodyInfo.class);
         log.info("Registration answer: " + info);
         return info;
     }
