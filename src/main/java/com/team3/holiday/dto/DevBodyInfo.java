@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Builder
-public class DevBodyInfoDto {
+public class DevBodyInfo {
 
     private String name;
     private String token;
