@@ -15,7 +15,6 @@ public class DecodeCaesarCipherUtil {
                 decodedText.append(character);
             }
         }
-
         return decodedText.toString();
     }
 }
