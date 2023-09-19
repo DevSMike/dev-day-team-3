@@ -1,6 +1,7 @@
 package com.team3.holiday.service.task4;
 
-import com.team3.holiday.service.HttpClientService;
+import com.team3.holiday.service.client.HttpClientService;
+import com.team3.holiday.tasks.TaskFourHtml;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,7 +16,7 @@ class HttpClientServiceImplTest {
 
     @Test
     void decodeMessage_whenStringIsIncorrectCoded_thenReturnDecodedString() {
-       String decoded =  service.decodeCongratulations(TaskFourTestHTML.getTempFourTask());
+       String decoded =  service.decodeCongratulations(TaskFourHtml.getTempFourTask());
        assertEquals("Широкая электрификация", decoded);
     }
 }
