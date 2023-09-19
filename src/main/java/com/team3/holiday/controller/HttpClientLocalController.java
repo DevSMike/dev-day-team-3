@@ -8,6 +8,7 @@ import com.team3.holiday.service.client.HttpClientService;
 import com.team3.holiday.tasks.TaskFourHtml;
 import com.team3.holiday.tasks.TaskThreeHtml;
 import com.team3.holiday.tasks.TaskTwoHtml;
+import com.team3.holiday.util.DecodeMessageCheckingServerLogicUtil;
 import com.team3.holiday.util.PasswordCheckingServerLogicUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -190,7 +191,7 @@ public class HttpClientLocalController {
     @PostMapping("task4/answer")
     public String taskFourCheckDecodedMessage (@RequestBody String bodyValue) {
         log.debug("HttpClientLocalController: checking generated password on task 3");
-        return PasswordCheckingServerLogicUtil.checkingPasswordByServer(bodyValue);
+        return DecodeMessageCheckingServerLogicUtil.checkingDecodingMessageByServer(bodyValue);
     }
 
 }
