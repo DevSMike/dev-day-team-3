@@ -2,7 +2,7 @@ package com.team3.holiday.service.password;
 
 public interface PasswordGenerationService {
 
-    Integer tryLocalPass(String password);
+    String hackLocalPass();
 
-    Integer tryPass(String password);
+    String hackPass();
 }

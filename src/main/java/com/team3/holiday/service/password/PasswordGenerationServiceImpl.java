@@ -1,45 +1,91 @@
 package com.team3.holiday.service.password;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
-import org.springframework.web.reactive.function.client.WebClient;
+import com.team3.holiday.util.PasswordGeneratorRequestsUtil;
+import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 
-@Slf4j
-public class PasswordGenerationServiceImpl implements PasswordGenerationService {
+@Service
+public class PasswordGenerationServiceImpl implements PasswordGenerationService{
 
-    private final WebClient webClient = WebClient.create();
-
-    @Override
-    public Integer tryLocalPass(String password) {
-        String result = webClient.post()
-                .uri("http://localhost:8080/test/task3/answer")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .bodyValue("{\"password\": \"" + password + "\"}")
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
-
-        log.debug("PasswordGenerationServiceImpl: tryLocalPass answer: {}", result);
-        return decodeAnswerToInt(result);
-    }
+    private static final char[] CHARS = {
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            'A', 'B', 'C', 'D', 'E', 'F',
+            'a', 'b', 'c', 'd', 'e', 'f'
+    };
 
     @Override
-    public Integer tryPass(String password) {
-        return null;
-    }
+    public String hackLocalPass() {
+        long a = 0L;
+        long b = passToLong("ffffffff");
+        long m = (a + b) / 2;
 
-    private int decodeAnswerToInt(String result) {
-        switch (result) {
-            case ">pass": {
-                return 1;
+        while (true) {
+            int response = PasswordGeneratorRequestsUtil.tryLocalPass(longToPass(m));
+
+            if (response == 1) {
+                b = m;
+                m = (a + b) / 2;
+            } else if (response == -1) {
+                a = m;
+                m = (a + b) / 2;
+            } else if (response == 0) {
+                break;
+            } else {
+                throw new RuntimeException("tryPass(" + longToPass(m) + ") вернул " + response);
             }
-            case "<pass": {
-                return -1;
-            }
-            default:
-                return 0;
         }
+        return longToPass(m);
+    }
+
+    @Override
+    public String hackPass() {
+        long a = 0L;
+        long b = passToLong("ffffffff");
+        long m = (a + b) / 2;
+
+        while (true) {
+            int response = PasswordGeneratorRequestsUtil.tryPass(longToPass(m));
+
+            if (response == 1) {
+                b = m;
+                m = (a + b) / 2;
+            } else if (response == -1) {
+                a = m;
+                m = (a + b) / 2;
+            } else if (response == 0) {
+                break;
+            } else {
+                throw new RuntimeException("tryPass(" + longToPass(m) + ") вернул " + response);
+            }
+        }
+        return longToPass(m);
+    }
+
+    private long passToLong(String password) {
+        int len = password.length();
+        long res = 0L;
+        long pow = 1;
+
+        for (int i = len - 1; i >= 0; i--) {
+            res += Arrays.binarySearch(CHARS, password.charAt(i)) * pow;
+            pow *= 22;
+        }
+
+        return res;
+    }
+
+    private String longToPass(long number) {
+        int r = 0;
+        StringBuilder res = new StringBuilder();
+
+        while (number > 0) {
+
+            r = (int) (number % 22);
+            res.insert(0, CHARS[r]);
+            number = number / 22;
+        }
+
+        return res.toString();
     }
 }
