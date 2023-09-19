@@ -14,7 +14,9 @@ public interface HttpClientService {
 
     String generatePassword();
 
+    String generateLocalPassword();
+
     String decodeCongratulations(String coded);
 
-    int tryDecodedPass(String bodyValue);
+
 }

@@ -87,8 +87,8 @@ public class HttpClientController {
         log.info("HttpClientController: guessing a password");
 
         String pass = httpClientService.generatePassword();
-        //async query
         String result = null;
+
         try {
             result = client.post()
                     .uri("http://ya.praktikum.fvds.ru:8080/dev-day/task/3")

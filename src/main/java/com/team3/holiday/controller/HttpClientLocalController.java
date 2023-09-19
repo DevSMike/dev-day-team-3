@@ -5,8 +5,10 @@ import com.team3.holiday.dto.DevBodyInfo;
 import com.team3.holiday.dto.ServerAnswerDto;
 import com.team3.holiday.model.DevBody;
 import com.team3.holiday.service.client.HttpClientService;
+import com.team3.holiday.tasks.TaskFourHtml;
 import com.team3.holiday.tasks.TaskThreeHtml;
 import com.team3.holiday.tasks.TaskTwoHtml;
+import com.team3.holiday.util.PasswordCheckingServerLogicUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -27,7 +29,7 @@ public class HttpClientLocalController {
     //task 1 09/09/23
     @PostMapping("/task1")
     public Mono<DevBodyInfo> taskOneMakeRegister(@RequestBody DevBody body) {
-        log.info("HttpClientLocalController: making a register on task 1");
+        log.debug("HttpClientLocalController: making a register on task 1");
         DevBodyDto bodyDto = httpClientService.registerUser(body);
 
         //async query
@@ -43,7 +45,7 @@ public class HttpClientLocalController {
 
     @PostMapping("/task1/answer")
     public Mono<DevBodyInfo> taskOneAnswerRegistration(@RequestBody DevBody body) {
-        log.info("HttpClientLocalController: answer a register on task 1");
+        log.debug("HttpClientLocalController: answer a register on task 1");
         DevBodyInfo answer = httpClientService.getRegistrationAnswer(body);
 
         log.info("Registration answer: " + answer);
@@ -52,7 +54,7 @@ public class HttpClientLocalController {
 
     @PostMapping("/task2")
     public String taskTwoDecodeMessage() {
-        log.info("HttpClientLocalController: making a  task 2");
+        log.debug("HttpClientLocalController: making a  task 2");
         String resultOfGet = null;
 
         try {
@@ -87,13 +89,13 @@ public class HttpClientLocalController {
 
     @GetMapping("/task2/html")
     public String taskTwoGetHtmlSecondTask() {
-        log.info("HttpClientLocalController: asking for HTML on task 2");
+        log.debug("HttpClientLocalController: asking for HTML on task 2");
         return TaskTwoHtml.getTempSecondTask();
     }
 
     @PostMapping("/task2/answer")
     public ServerAnswerDto taskTwoCheckDecodedMessage(@RequestBody String decodedMessage) {
-        log.info("HttpClientLocalController: checking decoded message on task 2");
+        log.debug("HttpClientLocalController: checking decoded message on task 2");
         String answer = "{\"decoded\": \"HAVE A FINE REACT CODING DAY\"}";
 
         if (decodedMessage.equals(answer)) {
@@ -109,11 +111,11 @@ public class HttpClientLocalController {
 
     @PostMapping("/task3")
     public String generatePassword() {
-        log.info("HttpClientController: guessing a password");
+        log.debug("HttpClientController: guessing a password");
 
-        String pass = httpClientService.generatePassword();
-        //async query
+        String pass = httpClientService.generateLocalPassword();
         String result = null;
+
         try {
             result = client.post()
                     .uri("http://localhost:8080/test/task3/answer")
@@ -130,37 +132,65 @@ public class HttpClientLocalController {
         return result;
     }
 
-
     @GetMapping("/task3/html")
     public String taskThreeGetThirdTask() {
-        log.info("HttpClientLocalController: asking for HTML on task 3");
+        log.debug("HttpClientLocalController: asking for HTML on task 3");
         return TaskThreeHtml.getTempThirdTask();
     }
 
-
     @PostMapping("/task3/answer")
     public String taskThreeCheckGeneratedPassword(@RequestBody String bodyValue) {
-        log.info("HttpClientLocalController: checking generated password on task 3");
-        char[] answer = { '5', '5', 'C', 'f', 'c', 'e', 'f', '9'};
-
-        String password = bodyValue.substring(bodyValue.lastIndexOf(":") + 3, bodyValue.lastIndexOf("\""));
-        char[] charPass = password.toCharArray();
-
-        for (int i = 0; i < password.length(); i++) {
-            if (charPass[i] > answer[i]) {
-                return ">pass";
-            } else if (charPass[i] < answer[i]) {
-                return "<pass";
-            }
-        }
-        ServerAnswerDto serverAnswer = ServerAnswerDto.builder()
-                .completed(true)
-                .message("Получилось! Вы бы точно спасли Зион ^.^")
-                .nextTaskUrl("http://ya.praktikum.fvds.ru:8080/dev-day/task/4")
-                .build();
-
-        return serverAnswer.toString();
+        log.debug("HttpClientLocalController: checking generated password on task 3");
+        return PasswordCheckingServerLogicUtil.checkingPasswordByServer(bodyValue);
     }
 
+    @PostMapping("/task4")
+    public String sendDecodedString() {
+        log.debug("HttpClientLocalController: congratulate with dev day");
+
+        String htmlText = null;
+
+        try {
+            htmlText = client.get()
+                    .uri("http://localhost:8080/test/task4/html")
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+        } catch (WebClientResponseException.BadRequest ex) {
+            String responseBody = ex.getResponseBodyAsString();
+            log.info(responseBody);
+        }
+
+        String decoded = httpClientService.decodeCongratulations(htmlText);
+        String result = "";
+
+        try {
+            result = client.post()
+                    .uri("http://localhost:8080/test/task4/answer")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .bodyValue("{\"congratulation\": \"" + decoded + "\"}")
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+        } catch (WebClientResponseException.BadRequest ex) {
+            String responseBody = ex.getResponseBodyAsString();
+            log.info(responseBody);
+        }
+
+        return result;
+    }
+
+    @GetMapping("/task4/html")
+    public String taskFourGetFourthTask() {
+        log.debug("HttpClientLocalController: asking for HTML on task 4");
+        return TaskFourHtml.getTempFourTask();
+    }
+
+    @PostMapping("task4/answer")
+    public String taskFourCheckDecodedMessage (@RequestBody String bodyValue) {
+        log.debug("HttpClientLocalController: checking generated password on task 3");
+        return PasswordCheckingServerLogicUtil.checkingPasswordByServer(bodyValue);
+    }
 
 }

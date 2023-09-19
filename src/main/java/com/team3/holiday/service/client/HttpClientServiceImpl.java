@@ -6,7 +6,7 @@ import com.team3.holiday.dto.DevBodyDto;
 import com.team3.holiday.dto.DevBodyInfo;
 import com.team3.holiday.model.DevBody;
 import com.team3.holiday.util.DecoderRequesterUtil;
-import com.team3.holiday.util.password.GeneratePasswordLocalUtil;
+import com.team3.holiday.service.password.PasswordGenerationServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,10 +25,7 @@ import static com.team3.holiday.util.ExtractFromStringUtil.extractValueFromRespo
 @RequiredArgsConstructor
 public class HttpClientServiceImpl implements HttpClientService {
 
-//    private final MathCore mathCore;
-
-    private final GeneratePasswordLocalUtil generatePasswordLocalUtil;
-
+    private final PasswordGenerationServiceImpl passGenService;
 
     @Override
     public DevBodyDto registerUser(DevBody body) {
@@ -68,35 +65,16 @@ public class HttpClientServiceImpl implements HttpClientService {
 
     @Override
     public String generatePassword() {
-//        String characters = "0123456789ABCDEFabcdef";
-//        int passwordLength = 8; // Максимальная длина пароля
-//        return generatePasswords(characters, passwordLength);
         log.info("HttpClientService: hacking the pass");
-        return generatePasswordLocalUtil.hackPass();
+        return passGenService.hackPass();
     }
 
     @Override
-    public int tryDecodedPass(String bodyValue) {
-
-        char[] answer = { '5', '5', 'C', 'f', 'c', 'e', 'f', '9'};
-
-        //"{\"password\": \"" + pass + "\"}"
-        String password = bodyValue.substring(bodyValue.lastIndexOf(":") + 1, bodyValue.lastIndexOf("\""));
-        char[] charPass = password.toCharArray();
-
-        for (int i = 0; i < password.length(); i++) {
-            if (charPass[i] > answer[i]) {
-                return 1;
-            } else if (charPass[i] < answer[i]) {
-                return -1;
-            }
-
-        }
-        // вернет 1, если >pass
-        // вернет -1, если <pass
-        // вернет 0, если code 200
-        return 0;
+    public String generateLocalPassword() {
+        log.info("HttpClientService: hacking the local pass");
+        return passGenService.hackLocalPass();
     }
+
 
     @Override
     public String decodeCongratulations(String HTMLText) {
@@ -112,7 +90,6 @@ public class HttpClientServiceImpl implements HttpClientService {
         return result;
 
     }
-
 
 
 }
