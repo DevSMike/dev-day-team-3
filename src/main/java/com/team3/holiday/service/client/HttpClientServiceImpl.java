@@ -1,11 +1,13 @@
-package com.team3.holiday.service;
+package com.team3.holiday.service.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team3.holiday.dto.DevBodyDto;
-import com.team3.holiday.dto.DevBodyInfoDto;
+import com.team3.holiday.dto.DevBodyInfo;
 import com.team3.holiday.model.DevBody;
 import com.team3.holiday.util.DecoderRequesterUtil;
+import com.team3.holiday.util.password.GeneratePasswordLocalUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -17,11 +19,16 @@ import static com.team3.holiday.dto.mapper.DevBodyMapper.toDevBodyInfoDtoFromDev
 import static com.team3.holiday.util.DecodeCaesarCipherUtil.decodeCaesarCipher;
 import static com.team3.holiday.util.ExtractFromStringUtil.extractValueFromCodeSpan;
 import static com.team3.holiday.util.ExtractFromStringUtil.extractValueFromResponse;
-import static com.team3.holiday.util.PasswordGeneratorUtil.generatePasswords;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class HttpClientServiceImpl implements HttpClientService {
+
+//    private final MathCore mathCore;
+
+    private final GeneratePasswordLocalUtil generatePasswordLocalUtil;
+
 
     @Override
     public DevBodyDto registerUser(DevBody body) {
@@ -43,7 +50,7 @@ public class HttpClientServiceImpl implements HttpClientService {
     }
 
     @Override
-    public DevBodyInfoDto getRegistrationAnswer(DevBody body) {
+    public DevBodyInfo getRegistrationAnswer(DevBody body) {
         log.debug("HttpClientServiceImpl: answer a reg with object: " + body);
         return toDevBodyInfoDtoFromDevBody(body);
     }
@@ -61,9 +68,34 @@ public class HttpClientServiceImpl implements HttpClientService {
 
     @Override
     public String generatePassword() {
-        String characters = "0123456789ABCDEFabcdef";
-        int passwordLength = 8; // Максимальная длина пароля
-        return generatePasswords(characters, passwordLength);
+//        String characters = "0123456789ABCDEFabcdef";
+//        int passwordLength = 8; // Максимальная длина пароля
+//        return generatePasswords(characters, passwordLength);
+        log.info("HttpClientService: hacking the pass");
+        return generatePasswordLocalUtil.hackPass();
+    }
+
+    @Override
+    public int tryDecodedPass(String bodyValue) {
+
+        char[] answer = { '5', '5', 'C', 'f', 'c', 'e', 'f', '9'};
+
+        //"{\"password\": \"" + pass + "\"}"
+        String password = bodyValue.substring(bodyValue.lastIndexOf(":") + 1, bodyValue.lastIndexOf("\""));
+        char[] charPass = password.toCharArray();
+
+        for (int i = 0; i < password.length(); i++) {
+            if (charPass[i] > answer[i]) {
+                return 1;
+            } else if (charPass[i] < answer[i]) {
+                return -1;
+            }
+
+        }
+        // вернет 1, если >pass
+        // вернет -1, если <pass
+        // вернет 0, если code 200
+        return 0;
     }
 
     @Override
@@ -80,5 +112,7 @@ public class HttpClientServiceImpl implements HttpClientService {
         return result;
 
     }
+
+
 
 }

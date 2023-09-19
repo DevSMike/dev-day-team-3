@@ -1,4 +1,4 @@
-package com.team3.holiday.util;
+package com.team3.holiday.legacy;
 
 public class PasswordGeneratorUtil {
 

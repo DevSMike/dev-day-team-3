@@ -1,20 +1,20 @@
-package com.team3.holiday.service;
+package com.team3.holiday.service.client;
 
 import com.team3.holiday.dto.DevBodyDto;
-import com.team3.holiday.dto.DevBodyInfoDto;
+import com.team3.holiday.dto.DevBodyInfo;
 import com.team3.holiday.model.DevBody;
-
-import java.io.UnsupportedEncodingException;
 
 public interface HttpClientService {
 
     DevBodyDto registerUser(DevBody body);
 
-    DevBodyInfoDto getRegistrationAnswer(DevBody body);
+    DevBodyInfo getRegistrationAnswer(DevBody body);
 
     String decodeMessage(String code);
 
     String generatePassword();
 
     String decodeCongratulations(String coded);
+
+    int tryDecodedPass(String bodyValue);
 }
