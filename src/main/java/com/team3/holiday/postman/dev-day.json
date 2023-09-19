@@ -1,11 +1,48 @@
 {
   "info": {
-    "_postman_id": "b06e5306-d255-480f-845b-46dead0470b2",
+    "_postman_id": "82011363-407a-4eff-b27b-9381fc7086fc",
     "name": "Day of Programmer",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "25787051"
   },
   "item": [
+    {
+      "name": "local",
+      "item": [
+        {
+          "name": "Get Html Local Task 2",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "Making a Local Task 2",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "Get Html Local Task 3",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "make a task 3",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        }
+      ]
+    },
     {
       "name": "PostRegister",
       "request": {
@@ -85,7 +122,10 @@
       "name": "get_tast_2",
       "request": {
         "method": "GET",
-        "header": []
+        "header": [],
+        "url": {
+          "raw": ""
+        }
       },
       "response": []
     },
@@ -93,7 +133,10 @@
       "name": "task2_get_query",
       "request": {
         "method": "GET",
-        "header": []
+        "header": [],
+        "url": {
+          "raw": ""
+        }
       },
       "response": []
     },
@@ -101,7 +144,10 @@
       "name": "get_task_3",
       "request": {
         "method": "GET",
-        "header": []
+        "header": [],
+        "url": {
+          "raw": ""
+        }
       },
       "response": []
     },
@@ -127,7 +173,10 @@
       "name": "get_task_4",
       "request": {
         "method": "GET",
-        "header": []
+        "header": [],
+        "url": {
+          "raw": ""
+        }
       },
       "response": []
     }
