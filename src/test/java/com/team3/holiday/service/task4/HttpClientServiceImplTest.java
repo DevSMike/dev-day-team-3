@@ -16,7 +16,7 @@ class HttpClientServiceImplTest {
 
     @Test
     void decodeMessage_whenStringIsIncorrectCoded_thenReturnDecodedString() {
-       String decoded =  service.decodeCongratulations(TaskFourHtml.getTempFourTask());
-       assertEquals("Широкая электрификация", decoded);
+        String decoded = service.decodeCongratulations(TaskFourHtml.getTempFourTask());
+        assertEquals("Широкая электрификация", decoded);
     }
 }

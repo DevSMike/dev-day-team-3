@@ -8,8 +8,9 @@ import com.team3.holiday.service.client.HttpClientService;
 import com.team3.holiday.tasks.TaskFourHtml;
 import com.team3.holiday.tasks.TaskThreeHtml;
 import com.team3.holiday.tasks.TaskTwoHtml;
-import com.team3.holiday.util.DecodeMessageCheckingServerLogicUtil;
-import com.team3.holiday.util.PasswordCheckingServerLogicUtil;
+import com.team3.holiday.util.server.DecodeCaesarCipherServerLogic;
+import com.team3.holiday.util.server.DecodeMessageCheckingServerLogicUtil;
+import com.team3.holiday.util.server.PasswordCheckingServerLogicUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -54,7 +55,7 @@ public class HttpClientLocalController {
     }
 
     @PostMapping("/task2")
-    public String taskTwoDecodeMessage() {
+    public ServerAnswerDto taskTwoDecodeMessage() {
         log.debug("HttpClientLocalController: making a  task 2");
         String resultOfGet = null;
 
@@ -70,7 +71,7 @@ public class HttpClientLocalController {
         }
 
         String decoded = httpClientService.decodeMessage(resultOfGet);
-        String result = null;
+        ServerAnswerDto result = null;
 
         try {
             result = client.post()
@@ -78,7 +79,7 @@ public class HttpClientLocalController {
                     .contentType(MediaType.APPLICATION_JSON)
                     .bodyValue(decoded)
                     .retrieve()
-                    .bodyToMono(String.class)
+                    .bodyToMono(ServerAnswerDto.class)
                     .block();
         } catch (WebClientResponseException.BadRequest ex) {
             String responseBody = ex.getResponseBodyAsString();
@@ -95,27 +96,17 @@ public class HttpClientLocalController {
     }
 
     @PostMapping("/task2/answer")
-    public ServerAnswerDto taskTwoCheckDecodedMessage(@RequestBody String decodedMessage) {
+    public ServerAnswerDto taskTwoCheckDecodedMessage(@RequestBody String bodyValue) {
         log.debug("HttpClientLocalController: checking decoded message on task 2");
-        String answer = "{\"decoded\": \"HAVE A FINE REACT CODING DAY\"}";
-
-        if (decodedMessage.equals(answer)) {
-            return ServerAnswerDto.builder()
-                    .completed(true)
-                    .message("Вы успели! Настоящие программисты всегда на шаг впереди железяк:)")
-                    .nextTaskUrl("http://ya.praktikum.fvds.ru:8080/dev-day/task/3")
-                    .build();
-        } else {
-            throw new RuntimeException("BAD REQUEST");
-        }
+        return DecodeCaesarCipherServerLogic.checkingDecodeCaesarCipherByServer(bodyValue);
     }
 
     @PostMapping("/task3")
-    public String generatePassword() {
+    public ServerAnswerDto generatePassword() {
         log.debug("HttpClientController: guessing a password");
 
         String pass = httpClientService.generateLocalPassword();
-        String result = null;
+        ServerAnswerDto result = null;
 
         try {
             result = client.post()
@@ -124,7 +115,7 @@ public class HttpClientLocalController {
                     .accept(MediaType.APPLICATION_JSON)
                     .bodyValue("{\"password\": \"" + pass + "\"}")
                     .retrieve()
-                    .bodyToMono(String.class)
+                    .bodyToMono(ServerAnswerDto.class)
                     .block();
         } catch (WebClientResponseException.BadRequest ex) {
             String responseBody = ex.getResponseBodyAsString();
@@ -140,13 +131,13 @@ public class HttpClientLocalController {
     }
 
     @PostMapping("/task3/answer")
-    public String taskThreeCheckGeneratedPassword(@RequestBody String bodyValue) {
+    public ServerAnswerDto taskThreeCheckGeneratedPassword(@RequestBody String bodyValue) {
         log.debug("HttpClientLocalController: checking generated password on task 3");
         return PasswordCheckingServerLogicUtil.checkingPasswordByServer(bodyValue);
     }
 
     @PostMapping("/task4")
-    public String sendDecodedString() {
+    public ServerAnswerDto sendDecodedString() {
         log.debug("HttpClientLocalController: congratulate with dev day");
 
         String htmlText = null;
@@ -163,7 +154,7 @@ public class HttpClientLocalController {
         }
 
         String decoded = httpClientService.decodeCongratulations(htmlText);
-        String result = "";
+        ServerAnswerDto result = null;
 
         try {
             result = client.post()
@@ -172,7 +163,7 @@ public class HttpClientLocalController {
                     .accept(MediaType.APPLICATION_JSON)
                     .bodyValue("{\"congratulation\": \"" + decoded + "\"}")
                     .retrieve()
-                    .bodyToMono(String.class)
+                    .bodyToMono(ServerAnswerDto.class)
                     .block();
         } catch (WebClientResponseException.BadRequest ex) {
             String responseBody = ex.getResponseBodyAsString();
@@ -189,7 +180,7 @@ public class HttpClientLocalController {
     }
 
     @PostMapping("task4/answer")
-    public String taskFourCheckDecodedMessage (@RequestBody String bodyValue) {
+    public ServerAnswerDto taskFourCheckDecodedMessage (@RequestBody String bodyValue) {
         log.debug("HttpClientLocalController: checking generated password on task 3");
         return DecodeMessageCheckingServerLogicUtil.checkingDecodingMessageByServer(bodyValue);
     }
