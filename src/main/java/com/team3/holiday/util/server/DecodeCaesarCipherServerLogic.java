@@ -9,8 +9,6 @@ public class DecodeCaesarCipherServerLogic {
 
     public static ServerAnswerDto checkingDecodeCaesarCipherByServer(String bodyValue) {
 
-        //String answer = "{\"decoded\": \"HAVE A FINE REACT CODING DAY\"}";
-
         String decoded = bodyValue.substring(bodyValue.lastIndexOf(":") + 3, bodyValue.lastIndexOf("\""));
 
         if (decoded.equals(ANSWER)) {
