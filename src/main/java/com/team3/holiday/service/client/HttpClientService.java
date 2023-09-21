@@ -8,7 +8,7 @@ public interface HttpClientService {
 
     DevBodyDto registerUser(DevBody body);
 
-    DevBodyInfo getRegistrationAnswer(DevBody body);
+    DevBodyInfo getRegistrationAnswer(DevBody body, String mainAnswer);
 
     String decodeMessage(String code);
 

@@ -144,7 +144,6 @@ public class HttpClientController {
         }
 
         return result;
-
     }
 }
 

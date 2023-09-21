@@ -1,8 +1,11 @@
 package com.team3.holiday.controller;
 
+import com.google.gson.Gson;
 import com.team3.holiday.dto.DevBodyDto;
 import com.team3.holiday.dto.DevBodyInfo;
 import com.team3.holiday.dto.ServerAnswerDto;
+import com.team3.holiday.dto.ServerAnswerErrorDto;
+import com.team3.holiday.exception.BadServerAnswerException;
 import com.team3.holiday.model.DevBody;
 import com.team3.holiday.service.client.HttpClientService;
 import com.team3.holiday.tasks.TaskFourHtml;
@@ -11,13 +14,13 @@ import com.team3.holiday.tasks.TaskTwoHtml;
 import com.team3.holiday.util.server.DecodeCaesarCipherServerLogic;
 import com.team3.holiday.util.server.DecodeMessageCheckingServerLogicUtil;
 import com.team3.holiday.util.server.PasswordCheckingServerLogicUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-import reactor.core.publisher.Mono;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,28 +33,39 @@ public class HttpClientLocalController {
 
     //task 1 09/09/23
     @PostMapping("/task1")
-    public Mono<DevBodyInfo> taskOneMakeRegister(@RequestBody DevBody body) {
+    public DevBodyInfo taskOneMakeRegister(@RequestBody DevBody body) {
         log.debug("HttpClientLocalController: making a register on task 1");
         DevBodyDto bodyDto = httpClientService.registerUser(body);
 
         //async query
-        return client.post()
-                .uri("http://localhost:8080/task1/answer")
-                .header("MAIN_ANSWER", "42")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .bodyValue(bodyDto.getRequestBodyJson())
-                .retrieve()
-                .bodyToMono(DevBodyInfo.class);
+        DevBodyInfo info = null;
+        try {
+            info = client.post()
+                    .uri("http://localhost:8080/test/task1/answer")
+                    .header("MAIN_ANSWER", "42")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .bodyValue(bodyDto.getRequestBodyJson())
+                    .retrieve()
+                    .bodyToMono(DevBodyInfo.class)
+                    .block();
+        } catch (WebClientResponseException.BadRequest e) {
+            Gson gson = new Gson();
+            ServerAnswerErrorDto error = gson.fromJson(e.getResponseBodyAsString(), ServerAnswerErrorDto.class);
+            throw new BadServerAnswerException(error.getErrorMessage());
+        }
+        return info;
     }
 
     @PostMapping("/task1/answer")
-    public Mono<DevBodyInfo> taskOneAnswerRegistration(@RequestBody DevBody body) {
+    public DevBodyInfo taskOneAnswerRegistration(@RequestBody DevBody body, HttpServletRequest servletRequest) {
         log.debug("HttpClientLocalController: answer a register on task 1");
-        DevBodyInfo answer = httpClientService.getRegistrationAnswer(body);
+
+        String mainAnswerHeader = servletRequest.getHeader("MAIN_ANSWER");
+        DevBodyInfo answer = httpClientService.getRegistrationAnswer(body, mainAnswerHeader);
 
         log.info("Registration answer: " + answer);
-        return Mono.just(answer);
+        return answer;
     }
 
     @PostMapping("/task2")

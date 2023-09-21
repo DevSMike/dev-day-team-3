@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team3.holiday.dto.DevBodyDto;
 import com.team3.holiday.dto.DevBodyInfo;
+import com.team3.holiday.exception.BadServerAnswerException;
 import com.team3.holiday.model.DevBody;
 import com.team3.holiday.util.DecoderRequesterUtil;
 import com.team3.holiday.service.password.PasswordGenerationServiceImpl;
@@ -47,8 +48,11 @@ public class HttpClientServiceImpl implements HttpClientService {
     }
 
     @Override
-    public DevBodyInfo getRegistrationAnswer(DevBody body) {
+    public DevBodyInfo getRegistrationAnswer(DevBody body, String mainAnswer) {
         log.debug("HttpClientServiceImpl: answer a reg with object: " + body);
+        if (!mainAnswer.equals("42")) {
+            throw new BadServerAnswerException("Answer on universal question is not correct!");
+        }
         return toDevBodyInfoDtoFromDevBody(body);
     }
 
