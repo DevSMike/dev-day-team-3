@@ -7,6 +7,7 @@
 3. [Третье задание](#3задание)
 4. [Четвёртое задание](#4задание)
 5. [Примечание](#прим)
+6. [Результат](#рез)
 
    
 <a name="1задание"></a>
@@ -357,4 +358,65 @@ private static HttpResponse makeDecodePostRequest(String codedString) throws IOE
 
 Пример методов для тестирования выполнения первого задания:
 ```java
+    @PostMapping("/task1")
+    public DevBodyInfo taskOneMakeRegister(@RequestBody DevBody body) {
+        log.debug("HttpClientLocalController: making a register on task 1");
+        DevBodyDto bodyDto = httpClientService.registerUser(body);
 
+        //async query
+        DevBodyInfo info = null;
+        try {
+            info = client.post()
+                    .uri("http://localhost:8080/test/task1/answer")
+                    .header("MAIN_ANSWER", "42")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .bodyValue(bodyDto.getRequestBodyJson())
+                    .retrieve()
+                    .bodyToMono(DevBodyInfo.class)
+                    .block();
+        } catch (WebClientResponseException.BadRequest e) {
+            Gson gson = new Gson();
+            ServerAnswerErrorDto error = gson.fromJson(e.getResponseBodyAsString(), ServerAnswerErrorDto.class);
+            throw new BadServerAnswerException(error.getErrorMessage());
+        }
+        return info;
+    }
+
+    @PostMapping("/task1/answer")
+    public DevBodyInfo taskOneAnswerRegistration(@RequestBody DevBody body, HttpServletRequest servletRequest) {
+        log.debug("HttpClientLocalController: answer a register on task 1");
+
+        String mainAnswerHeader = servletRequest.getHeader("MAIN_ANSWER");
+        DevBodyInfo answer = httpClientService.getRegistrationAnswer(body, mainAnswerHeader);
+
+        log.info("Registration answer: " + answer);
+        return answer;
+    }
+```
+
+Если ответ на в заголовке *MAIN_ANSWER* неверный, то локальный сервер вернте такой ответ с кодом ответа **400**:
+```json
+{
+    "completed": false,
+    "errorMessage": "Answer on universal question is not correct!",
+    "codeError": "BAD_REQUEST"
+}
+```
+
+В противном случае, локальный сервер вернет такой ответ с кодом ответа **200**: 
+```json
+{
+    "name": "Team3",
+    "token": "e26d3434-c970-482a-b055-e2a55a364581",
+    "nextTaskUrl": "http://ya.praktikum.fvds.ru:8080/dev-day/task/2"
+}
+```
+
+Тетсирование на локальном сервере остальных задач также представлено в классе **HttpClientLocalController**.
+
+<a name="рез"></a>
+### Результат 
+
+Наша команда **Team3** на данном мероприятии заняла почётное **2-е** место! :innocent:
+![Таблица результатов](https://i.ibb.co/QN3ZJN5/image-2023-09-14-23-18-28.png)
