@@ -3,8 +3,10 @@
 
 ## Содержание 
 1. [Первое задание](#1задание)
-2. [Второе задание](#второе-задание)
+2. [Второе задание](#2задание)
+3. [Третье задание](#3задание)
 
+   
 <a name="1задание"></a>
 ### Первое задание
 
@@ -142,3 +144,101 @@ public class DevBody {
     }
 }
 ```
+
+<a name="3задание"></a>
+### Третье задание 
+Подобрать пароль, ориентируясь на ответы сервера.
+
+Абстрактная версия решения представлена в классе **HttpClientController**.
+Используем метод для подбора пароля и отправляем ответ на сервер.
+
+Фрагмент класса *HttpClientController*:
+```java
+    @PostMapping("/task3")
+    public String generatePassword() {
+        log.info("HttpClientController: guessing a password");
+
+        String pass = httpClientService.generatePassword();
+        String result = null;
+
+        try {
+            result = client.post()
+                    .uri("http://ya.praktikum.fvds.ru:8080/dev-day/task/3")
+                    .header("AUTH_TOKEN", "e26d3434-c970-482a-b055-e2a55a364581")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .bodyValue("{\"password\": \"" + pass + "\"}")
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+        } catch (WebClientResponseException.BadRequest ex) {
+            String responseBody = ex.getResponseBodyAsString();
+            log.info(responseBody);
+        }
+        return result;
+    }
+```
+
+Метод, который используется для генерации пароля находится в классе **PasswordGenerationServiceImpl**:
+```java
+   public String hackPass() {
+        long a = 0L;
+        long b = passToLong("ffffffff");
+        long m = (a + b) / 2;
+
+        while (true) {
+            int response = PasswordGeneratorRequestsUtil.tryPass(longToPass(m));
+
+            if (response == 1) {
+                b = m;
+                m = (a + b) / 2;
+            } else if (response == -1) {
+                a = m;
+                m = (a + b) / 2;
+            } else if (response == 0) {
+                break;
+            } else {
+                throw new RuntimeException("tryPass(" + longToPass(m) + ") вернул " + response);
+            }
+        }
+        return longToPass(m);
+    }
+```
+
+Основой для данного алгоритма служит метод *tryPass(String password)*. Данный метод отправляет запрос на сервер, чтобы узнать: текущий символ >/< нужного. В ответ сервер выбрасывает исключение, которое парсится в строку, оттуда вытаскивается нужная информация: *>pass* или *<pass*. Это передается в алгоритм *tryPass(String password)*:
+
+```java
+    public static Integer tryPass(String password) {
+
+        String result = "";
+        try {
+            result = WEB_CLIENT.post()
+                    .uri("http://ya.praktikum.fvds.ru:8080/dev-day/task/3")
+                    .header("AUTH_TOKEN", "e26d3434-c970-482a-b055-e2a55a364581")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .bodyValue("{\"password\": \"" + password + "\"}")
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+        } catch (WebClientResponseException.BadRequest e) {
+            String errorMessage = e.getResponseBodyAsString();
+
+            if (errorMessage.contains(">")) {
+                result = errorMessage.substring(errorMessage.lastIndexOf(">"), errorMessage.lastIndexOf(">") + 5);
+            } else if (errorMessage.contains("<")) {
+                result = errorMessage.substring(errorMessage.lastIndexOf("<"), errorMessage.lastIndexOf("<") + 5);
+            } else {
+                log.error("Unsupported exceptions happens in PasswordGeneratorRequestsUtil tryPass(): {}", errorMessage);
+            }
+        }
+
+        log.debug("PasswordGeneratorRequestsUtil: tryPass answer: {}", result);
+
+        if (result == null) result = "";
+
+        return decodeAnswerToInt(result);
+    }
+```
+
+Таким образом, пароль генерируется максимально быстро: в худшем случае понадобится 66 запросов.
