@@ -14,10 +14,8 @@ public class PasswordCheckingServerLogicUtil {
 
         for (int i = 0; i < password.length(); i++) {
             if (charPass[i] > ANSWER[i]) {
-//                return ">pass";
                 throw new BadServerAnswerException(">pass");
             } else if (charPass[i] < ANSWER[i]) {
-//                return "<pass";
                 throw new BadServerAnswerException("<pass");
             }
         }
